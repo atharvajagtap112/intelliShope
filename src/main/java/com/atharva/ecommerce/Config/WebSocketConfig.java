@@ -15,7 +15,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final GeminiWebSocketHandler geminiWebSocketHandler;
 
-    @Autowired
+
     public WebSocketConfig(GeminiWebSocketHandler geminiWebSocketHandler) {
         this.geminiWebSocketHandler = geminiWebSocketHandler;
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.CacheErrorHandler;
@@ -28,7 +29,21 @@ public class RedisConfig implements CachingConfigurer {
 
     @Value("${spring.data.redis.url}")
     private String redisUrl;
-
+    @Bean
+    public CommandLineRunner testRedisConnection(RedisTemplate<String, Object> redisTemplate) {
+        return args -> {
+            try {
+                System.out.println("=== Testing Redis Connection ===");
+                redisTemplate.opsForValue().set("test:key", "test-value", Duration.ofMinutes(1));
+                String value = (String) redisTemplate.opsForValue().get("test:key");
+                System.out.println("✅ Redis connected successfully!  Test value: " + value);
+                redisTemplate.delete("test:key");
+            } catch (Exception e) {
+                System.err.println("❌ Redis connection failed: " + e.getMessage());
+                e.printStackTrace();
+            }
+        };
+    }
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
         System.out.println("=== Redis Configuration ===");

@@ -27,18 +27,34 @@ public class CartController {
 
     @GetMapping("/")
     public ResponseEntity<Cart>findUserCart(@RequestHeader("Authorization") String jwt) throws UserException {
-        User user=  userService.findUserProfileByJwt(jwt);
+        try {
+           User user=  userService.findUserProfileByJwt(jwt);
        Cart cart= cartService.findUserCart(user.getId());
       return new ResponseEntity<Cart>(cart,HttpStatus.OK);
+
+        } catch (Exception e) {
+            // Log the error for debugging
+            System. err.println("Error fetching cart: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @PutMapping("/add")
     public ResponseEntity<ApiResponse> addItemToCart(@RequestHeader("Authorization") String jwt,
                                                      @RequestBody AddItemRequest req) throws UserException, CartItemException, ProductException {
+
+        try{
+
         User user=  userService.findUserProfileByJwt(jwt);
         cartService.addCartItem(user.getId(), req);
      return new ResponseEntity<ApiResponse>(new ApiResponse("item added to cart",true),HttpStatus.CREATED);
     }
+        catch (Exception e) {
+            // Log the error for debugging
+            System.err.println("Error adding item to cart: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
 
-
-}
+}}

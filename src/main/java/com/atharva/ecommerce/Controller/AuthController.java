@@ -90,6 +90,16 @@ public class AuthController {
         Authentication authentication=authentication(email,password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
       String token=  jwtProvider.generateToken(authentication);
+
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            try {
+                cartService.findUserCart(user.getId());
+            } catch (Exception e) {
+                // Cart doesn't exist, create one
+                cartService.createCart(user);
+            }
+        }
         AuthResponse authResponse=new AuthResponse(token,"SignIn Success");
       return new ResponseEntity<AuthResponse>(authResponse,HttpStatus.CREATED) ;
     }

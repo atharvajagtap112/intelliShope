@@ -68,6 +68,7 @@ public class PaymentController {
           paymentLinkRequest.put("notify",notify);
 
           paymentLinkRequest.put("callback_url","https://intellishopy.vercel.app/payment/"+orderId);
+//          paymentLinkRequest.put("callback_url","http://localhost:3000/payment/"+orderId);
            paymentLinkRequest.put("callback_method","get");
 
           PaymentLink payment= razorpayClient.paymentLink.create(paymentLinkRequest);
@@ -89,7 +90,7 @@ public class PaymentController {
   @GetMapping("/payments")
   public ResponseEntity<ApiResponse> redirect(@RequestParam(name="payment_id") String paymentId,
                                               @RequestParam(name="order_id") Long orderId ) throws RazorpayException, OrderException {
-      System.out.println( "------------------------------------------------------------------payment ID"+paymentId+" order ID"+orderId);
+
        Order order=orderService.findOrderById(orderId);
        RazorpayClient razorpay =new RazorpayClient(apiKey,apiSecret);
 

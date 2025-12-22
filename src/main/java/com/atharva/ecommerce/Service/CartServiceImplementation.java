@@ -14,14 +14,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CartServiceImplementation implements CartService {
+    private final UserService userService;
     private ProductService productService;
     private CartRepository cartRepository;
     private CartItemServiceImplementation cartItemService;
 
-    public CartServiceImplementation(ProductService productService, CartRepository cartRepository, CartItemServiceImplementation cartItemService) {
+    public CartServiceImplementation(ProductService productService, CartRepository cartRepository, CartItemServiceImplementation cartItemService, UserService userService) {
         this.productService = productService;
         this.cartRepository = cartRepository;
         this.cartItemService = cartItemService;
+        this.userService = userService;
     }
 
     @Override
@@ -34,6 +36,10 @@ public class CartServiceImplementation implements CartService {
     @Override
     public String addCartItem(Long userId, AddItemRequest req) throws ProductException, CartItemException, UserException {
         Cart cart=cartRepository.findByUserId(userId);
+        if (cart == null) {
+            User user = userService.findUserById(userId);
+            cart = createCart(user);
+        }
 
         Product product=productService.findProductById(req.getProductId());
 
@@ -76,7 +82,9 @@ public class CartServiceImplementation implements CartService {
     @Override
     public Cart findUserCart(Long userId) {
        Cart cart=cartRepository.findByUserId(userId);
-
+        if (cart == null) {
+            throw new RuntimeException("Cart not found for user: " + userId);
+        }
        int totalPrice=0;
        int totalDiscountPrice=0;
        int totalItem=0;

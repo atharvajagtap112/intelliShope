@@ -65,26 +65,36 @@ public class ProductController {
 //    }
 
 
+//
+//    @PostMapping("/bycategories")
+//    @Cacheable(value ="ProductsByCategories" ,key = "#categories.toString()")
+//    public ResponseEntity<List<ProductsByCategoryResponse>> getProductsByCategoryHandler(@RequestBody List<ProductCategoryRequest> categories) throws ProductException {
+//          List<ProductsByCategoryResponse> productsByCategoryResponseList =new ArrayList<>();
+//        for (ProductCategoryRequest category : categories) {
+//           List<Product> products= productService.findProductsByCategory(category.getCategoryName());
+//           products=products.subList(0,Math.min(products.size(),10));
+//
+//           ProductsByCategoryResponse productsByCategoryResponse =new ProductsByCategoryResponse();
+//           productsByCategoryResponse.setProducts(products);
+//            productsByCategoryResponse.setCategoryName(category.getCategoryTitle());
+//
+//            productsByCategoryResponseList.add(productsByCategoryResponse);
+//        }
+
+
+
+//
+//
+//        return new ResponseEntity<>(productsByCategoryResponseList, HttpStatus.ACCEPTED);
+//    }
+
 
     @PostMapping("/bycategories")
-    @Cacheable(value ="ProductsByCategories" ,key = "#categories.toString()")
     public ResponseEntity<List<ProductsByCategoryResponse>> getProductsByCategoryHandler(@RequestBody List<ProductCategoryRequest> categories) throws ProductException {
-          List<ProductsByCategoryResponse> productsByCategoryResponseList =new ArrayList<>();
-        for (ProductCategoryRequest category : categories) {
-           List<Product> products= productService.findProductsByCategory(category.getCategoryName());
-           products=products.subList(0,Math.min(products.size(),10));
 
-           ProductsByCategoryResponse productsByCategoryResponse =new ProductsByCategoryResponse();
-           productsByCategoryResponse.setProducts(products);
-            productsByCategoryResponse.setCategoryName(category.getCategoryTitle());
-
-            productsByCategoryResponseList.add(productsByCategoryResponse);
-        }
-
-
-        return new ResponseEntity<>(productsByCategoryResponseList, HttpStatus.ACCEPTED);
+        List<ProductsByCategoryResponse> data = productService.getProductsByCategoriesLogic(categories);
+        return ResponseEntity.ok(data);
     }
-
 
     @PostMapping("delete/bycategories")
     public ResponseEntity<String> getProductsByCategoryHandler(@RequestParam String category) throws ProductException {

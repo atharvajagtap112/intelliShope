@@ -28,4 +28,11 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
     @Query("SELECT p FROM Product p WHERE p.category.name = :category")
     List<Product> findbyCategory(@Param("category") String category);
+
+
+
+    @Query("SELECT DISTINCT p FROM Product p " +
+            "LEFT JOIN FETCH p.category " +
+            "WHERE p.category. name = :categoryName")
+    List<Product> findProductsByCategoryWithSizes(@Param("categoryName") String categoryName);
 }
