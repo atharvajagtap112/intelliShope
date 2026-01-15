@@ -43,7 +43,41 @@ public class PaymentController {
  @Autowired
  private EmailService emailService;
 
-  @PostMapping("/payments/{orderId}")
+
+    @PostMapping("/payments/webhook")
+    public ResponseEntity<String> handleWebhook(
+            @RequestBody String payload,
+            @RequestHeader("X-Razorpay-Signature") String signature
+    ) throws Exception {
+
+        JSONObject json = new JSONObject(payload);
+        String event = json.getString("event");
+
+        if ("payment.captured".equals(event)) {
+
+            JSONObject paymentEntity =
+                    json.getJSONObject("payload")
+                            .getJSONObject("payment")
+                            .getJSONObject("entity");
+
+            String paymentId = paymentEntity.getString("id");
+            String orderId = paymentEntity.getJSONObject("notes").getString("orderId");
+
+            Order order = orderService.findOrderById(Long.valueOf(orderId));
+
+            order.getPaymentDetails().setPaymentId(paymentId);
+            order.getPaymentDetails().setStatus("COMPLETED");
+            order.setOrderStatus("ORDER_CONFIRMED");
+
+            orderRepository.save(order);
+            emailService.sendOrderConfirmationEmail(order);
+        }
+
+        return ResponseEntity.ok("OK");
+    }
+
+
+    @PostMapping("/payments/{orderId}")
    public ResponseEntity<PaymentLinkResponse> createPaymentLink(@PathVariable Long orderId,
                                                                 @RequestHeader("Authorization") String jwt ) throws OrderException, RazorpayException {
       Order order =orderService.findOrderById(orderId);
@@ -66,7 +100,10 @@ public class PaymentController {
           notify.put("email",true);
 
           paymentLinkRequest.put("notify",notify);
+          JSONObject notes = new JSONObject();
+          notes.put("orderId", order.getId());
 
+          paymentLinkRequest.put("notes", notes);
          paymentLinkRequest.put("callback_url","https://intellishopy.vercel.app/payment/"+orderId);
   //        paymentLinkRequest.put("callback_url","http://localhost:3000/payment/"+orderId);
            paymentLinkRequest.put("callback_method","get");
@@ -111,7 +148,7 @@ public class PaymentController {
               emailService.sendOrderConfirmationEmail(order);
               orderRepository.save(order);
           }
-          return new ResponseEntity<ApiResponse>(new ApiResponse("your order get placed",true),HttpStatus.OK);
+          return new ResponseEntity<>(new ApiResponse("your order get placed", true), HttpStatus.OK);
        }
        catch (Exception e){
     throw new RazorpayException(e.getMessage());

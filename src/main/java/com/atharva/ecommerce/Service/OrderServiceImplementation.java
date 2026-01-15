@@ -71,8 +71,8 @@ public class OrderServiceImplementation implements OrderService {
         createdOrder.setTotalDiscountedPrice(cart.getTotalDiscountPrice());
         createdOrder.setShippingAddress(address);
         createdOrder.setOrderDate(LocalDateTime.now());
-        createdOrder.setOrderStatus("PENDING");  // Enum
-        createdOrder.getPaymentDetails().setStatus("PENDING");  // Enum
+        createdOrder.setOrderStatus("PENDING");
+        createdOrder.getPaymentDetails().setStatus("PENDING");
         createdOrder.setCreatedAt(LocalDateTime.now());
 
         Order savedOrder = orderRepository.save(createdOrder);
