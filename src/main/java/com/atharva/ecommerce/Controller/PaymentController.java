@@ -8,10 +8,7 @@ import com.atharva.ecommerce.Response.PaymentLinkResponse;
 import com.atharva.ecommerce.Service.EmailService;
 import com.atharva.ecommerce.Service.OrderService;
 import com.atharva.ecommerce.Service.UserService;
-import com.razorpay.Payment;
-import com.razorpay.PaymentLink;
-import com.razorpay.RazorpayClient;
-import com.razorpay.RazorpayException;
+import com.razorpay.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +39,7 @@ public class PaymentController {
 
  @Autowired
  private EmailService emailService;
+    private String webhookSecret="rzp_webhook_test_123";
 
 
     @PostMapping("/payments/webhook")
@@ -49,6 +47,18 @@ public class PaymentController {
             @RequestBody String payload,
             @RequestHeader("X-Razorpay-Signature") String signature
     ) throws Exception {
+
+        // 🔐 VERIFY SIGNATURE
+        boolean isValid = Utils.verifyWebhookSignature(
+                payload,
+                signature,
+                webhookSecret
+        );
+
+        if (!isValid) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid webhook signature");
+        }
 
         JSONObject json = new JSONObject(payload);
         String event = json.getString("event");
@@ -61,7 +71,9 @@ public class PaymentController {
                             .getJSONObject("entity");
 
             String paymentId = paymentEntity.getString("id");
-            String orderId = paymentEntity.getJSONObject("notes").getString("orderId");
+            String orderId = paymentEntity
+                    .getJSONObject("notes")
+                    .getString("orderId");
 
             Order order = orderService.findOrderById(Long.valueOf(orderId));
 
