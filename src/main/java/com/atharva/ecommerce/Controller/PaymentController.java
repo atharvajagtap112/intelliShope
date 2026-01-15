@@ -48,7 +48,6 @@ public class PaymentController {
             @RequestHeader("X-Razorpay-Signature") String signature
     ) throws Exception {
 
-        // 🔐 VERIFY SIGNATURE
         boolean isValid = Utils.verifyWebhookSignature(
                 payload,
                 signature,
@@ -156,9 +155,14 @@ public class PaymentController {
               order.getPaymentDetails().setPaymentId(paymentId);
               order.getPaymentDetails().setStatus("COMPLETED");
               order.setOrderStatus("ORDER_CONFIRMED");
+               orderRepository.save(order);
 
-              emailService.sendOrderConfirmationEmail(order);
-              orderRepository.save(order);
+               try {
+                   emailService.sendOrderConfirmationEmail(order);
+               } catch (Exception e) {
+                   System.out.println("Email failed: " + e.getMessage());
+               }
+
           }
           return new ResponseEntity<>(new ApiResponse("your order get placed", true), HttpStatus.OK);
        }
