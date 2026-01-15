@@ -15,7 +15,7 @@ public class Order {
     Long id;
 
 
-    private String orderId;
+
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -49,9 +49,9 @@ public class Order {
 
     public Order() {}
 
-    public Order(Long id, String orderId, User user, List<OrderItem> orderItems, LocalDateTime orderDate, LocalDateTime deliveryDate, Address shippingAdress, PaymentDetails paymentDetails, double totalPrice, Integer totalDiscountedPrice, Integer discount, String orderStatus, int totalItem, LocalDateTime createdAt) {
+    public Order(Long id, User user, List<OrderItem> orderItems, LocalDateTime orderDate, LocalDateTime deliveryDate, Address shippingAdress, PaymentDetails paymentDetails, double totalPrice, Integer totalDiscountedPrice, Integer discount, String orderStatus, int totalItem, LocalDateTime createdAt) {
         this.id = id;
-        this.orderId = orderId;
+
         this.user = user;
         this.orderItems = orderItems;
         this.orderDate = orderDate;
@@ -74,13 +74,7 @@ public class Order {
         this.id = id;
     }
 
-    public String getOrderId() {
-        return orderId;
-    }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
 
     public User getUser() {
         return user;

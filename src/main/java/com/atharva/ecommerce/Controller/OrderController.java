@@ -45,7 +45,9 @@ public class OrderController {
     public ResponseEntity<List<Order>> userOrdersHistory(@RequestHeader("Authorization") String jwt , @RequestBody List<String> status)  throws UserException{
 
         User user =userService.findUserProfileByJwt(jwt);
+        System.out.println("User "+user.getEmail());
        List<Order> orders= orderService.usersOrderHistory(user.getId());
+        System.out.println("Orders "+orders.size() + "status "+status.toString());
 
        if (!status.get(0).equals("ALL")){
            orders = orders.stream()
@@ -53,6 +55,7 @@ public class OrderController {
                    .collect(Collectors.toList());
        }
 
+        System.out.println("Orders f"+orders.size());
        return new ResponseEntity<>(orders, HttpStatus.CREATED);
     }
 
