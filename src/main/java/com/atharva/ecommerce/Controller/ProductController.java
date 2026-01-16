@@ -5,15 +5,15 @@ import com.atharva.ecommerce.Model.Product;
 import com.atharva.ecommerce.Repository.ProductRepository;
 import com.atharva.ecommerce.Request.ProductCategoryRequest;
 import com.atharva.ecommerce.Response.ProductsByCategoryResponse;
+import com.atharva.ecommerce.Service.ClipSearchServics;
 import com.atharva.ecommerce.Service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -27,6 +27,30 @@ public class ProductController {
 
    @Autowired
    private ProductRepository productRepository;
+
+   @Autowired
+   private ClipSearchServics clipSearchServics;
+
+
+    @PostMapping("/search/image")
+    public List<Product> searchByImage(
+            @RequestParam("image") MultipartFile image,
+            @RequestParam(required = false) String color
+    ) throws Exception {
+
+        List<Long> productIds = clipSearchServics.search(image);
+
+        List<Product> products = productRepository.findAllById(productIds);
+
+        if (color != null) {
+            products = products.stream()
+                    .filter(p -> p.getColor().equalsIgnoreCase(color))
+                    .toList();
+        }
+
+        return products;
+    }
+
 
 
     @GetMapping()
