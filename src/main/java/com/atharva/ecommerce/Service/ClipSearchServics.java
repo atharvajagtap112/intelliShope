@@ -37,7 +37,7 @@ public class ClipSearchServics {
 
         ResponseEntity<Map> response = restTemplate.postForEntity(
 //                "http://localhost:8000/search",
-                "https://heyatharva-imagesearch.hf.space/search",
+                "https://heyatharva-image-search.hf.space/search",
                 request,
                 Map.class
         );

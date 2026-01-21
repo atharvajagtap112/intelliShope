@@ -115,8 +115,8 @@ public class PaymentController {
           notes.put("orderId", order.getId());
 
           paymentLinkRequest.put("notes", notes);
-         paymentLinkRequest.put("callback_url","https://intellishopy.vercel.app/payment/"+orderId);
-  //        paymentLinkRequest.put("callback_url","http://localhost:3000/payment/"+orderId);
+//         paymentLinkRequest.put("callback_url","https://intellishopy.vercel.app/payment/"+orderId);
+          paymentLinkRequest.put("callback_url","http://localhost:3000/payment/"+orderId);
            paymentLinkRequest.put("callback_method","get");
 
           PaymentLink payment= razorpayClient.paymentLink.create(paymentLinkRequest);
